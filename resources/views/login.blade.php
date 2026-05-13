@@ -17,20 +17,22 @@
                 <p class="login-subtitle">Welcome back! Please login to your account.</p>
             </div>
 
-            <form action="#" method="POST">
-                <div class="form-group">
-                    <label class="form-label" for="role">Select Role</label>
-                    <select class="form-control" id="role" name="role" required>
-                        <option value="" disabled selected>Choose your role...</option>
-                        <option value="admin">Admin</option>
-                        <option value="warehouse">Warehouse</option>
-                        <option value="account">Account</option>
-                    </select>
-                </div>
+            <form action="{{ url('/login') }}" method="POST">
+                @csrf
+                
+                @if ($errors->any())
+                    <div style="background: #fee2e2; color: #b91c1c; padding: 12px; border-radius: 6px; margin-bottom: 16px;">
+                        <ul style="margin: 0; padding-left: 20px; font-size: 0.85rem;">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
                 <div class="form-group">
                     <label class="form-label" for="email">Email Address</label>
-                    <input type="email" class="form-control" id="email" name="email" placeholder="name@company.com" required>
+                    <input type="email" class="form-control" id="email" name="email" value="{{ old('email') }}" placeholder="name@company.com" required>
                 </div>
 
                 <div class="form-group">
@@ -38,8 +40,7 @@
                     <input type="password" class="form-control" id="password" name="password" placeholder="••••••••" required>
                 </div>
 
-                <!-- Temporarily using a simple link to simulate successful login and redirect to the dashboard -->
-                <button type="button" class="login-btn" onclick="window.location.href='/admin/dashboard'">Sign In</button>
+                <button type="submit" class="login-btn">Sign In</button>
             </form>
         </div>
     </div>

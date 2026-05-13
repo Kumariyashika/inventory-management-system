@@ -81,6 +81,29 @@
         .status-progress { background: var(--primary-light); color: var(--primary); }
         .status-pending { background: var(--warning-light); color: var(--warning); }
         .status-overdue { background: var(--danger-light); color: var(--danger); }
+
+        /* Profile Dropdown Styles */
+        .user-profile-container { position: relative; }
+        .user-profile { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 6px 6px 6px 16px; background: #E2E8F0; border-radius: 30px; transition: all 0.2s; }
+        .user-profile:hover { background: #CBD5E1; }
+        .user-info { text-align: right; }
+        .user-info .name { font-size: 14px; font-weight: 700; color: #1F2937; line-height: 1.2; display: block; }
+        .user-info .role { font-size: 12px; color: #64748B; font-weight: 500; }
+        .avatar-text { width: 36px; height: 36px; border-radius: 50%; background: #FFFFFF; color: #4361EE; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; border: 2px solid #FFFFFF; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .profile-dropdown { position: absolute; top: calc(100% + 10px); right: 0; width: 260px; background: #FFFFFF; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); border: 1px solid #E5E7EB; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.2s ease; z-index: 1000; }
+        .profile-dropdown.show { opacity: 1; visibility: visible; transform: translateY(0); }
+        .profile-dropdown::before { content: ''; position: absolute; top: -6px; right: 24px; width: 12px; height: 12px; background: #FFFFFF; transform: rotate(45deg); border-left: 1px solid #E5E7EB; border-top: 1px solid #E5E7EB; }
+        .dropdown-header { padding: 24px 20px 16px; text-align: center; border-bottom: 1px solid #E5E7EB; }
+        .dropdown-illustration { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin: 0 auto 12px; border: 3px solid #F8FAFC; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .dropdown-name { font-size: 16px; font-weight: 700; color: #1F2937; margin-bottom: 2px; }
+        .dropdown-role { font-size: 13px; color: #64748B; font-weight: 500; }
+        .dropdown-body { padding: 16px 20px; border-bottom: 1px solid #E5E7EB; }
+        .dropdown-item { display: flex; align-items: center; gap: 12px; font-size: 14px; color: #4B5563; margin-bottom: 12px; }
+        .dropdown-item:last-child { margin-bottom: 0; }
+        .dropdown-item i { font-size: 18px; color: #64748B; }
+        .dropdown-footer { padding: 12px 16px; }
+        .dropdown-logout { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; background: none; border: none; color: #EF4444; font-size: 14px; font-weight: 500; cursor: pointer; border-radius: 8px; transition: all 0.2s; }
+        .dropdown-logout:hover { background: #FEF2F2; }
     </style>
 </head>
 <body>
@@ -151,11 +174,37 @@
                     <i class="ph ph-bell"></i>
                     <span class="notif-dot">2</span>
                 </button>
-                <div class="user-chip">
-                    <img src="https://ui-avatars.com/api/?name=Store+Manager&background=4361EE&color=fff" class="user-avatar" alt="Store">
-                    <div>
-                        <div class="user-name">Store Manager</div>
-                        <div class="user-role">Store Zone</div>
+                <div class="user-profile-container">
+                    <div class="user-profile">
+                        <div class="user-info">
+                            <span class="name">Store Manager</span>
+                            <span class="role">Store Zone</span>
+                        </div>
+                        <div class="avatar-text">S</div>
+                    </div>
+                    
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="dropdown-header">
+                            <img src="https://ui-avatars.com/api/?name=Store+Manager&background=E2E8F0&color=4361EE&size=80" alt="Store Manager" class="dropdown-illustration">
+                            <div class="dropdown-name">Store Manager</div>
+                            <div class="dropdown-role">Store Zone</div>
+                        </div>
+                        <div class="dropdown-body">
+                            <div class="dropdown-item">
+                                <i class="ph ph-phone"></i> +1 234 567 8900
+                            </div>
+                            <div class="dropdown-item">
+                                <i class="ph ph-envelope"></i> store@inventorypro.com
+                            </div>
+                        </div>
+                        <div class="dropdown-footer">
+                            <form action="{{ route('logout') }}" method="POST">
+                                @csrf
+                                <button type="submit" class="dropdown-logout">
+                                    <i class="ph ph-sign-out"></i> Logout
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -165,5 +214,24 @@
         </div>
     </main>
     @yield('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const userProfile = document.querySelector('.user-profile');
+            const profileDropdown = document.getElementById('profileDropdown');
+            
+            if (userProfile && profileDropdown) {
+                userProfile.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    profileDropdown.classList.toggle('show');
+                });
+
+                document.addEventListener('click', function(e) {
+                    if (!profileDropdown.contains(e.target) && !userProfile.contains(e.target)) {
+                        profileDropdown.classList.remove('show');
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

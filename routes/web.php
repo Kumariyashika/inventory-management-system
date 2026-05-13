@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\Auth\LoginController;
 
 /*
 |--------------------------------------------------------------------------
@@ -8,7 +10,8 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', fn() => view('login'));
+Route::get('/', fn() => view('login'))->name('login');
+Route::post('/login', [LoginController::class, 'authenticate']);
 Route::post('/logout', function () {
     return redirect('/');
 })->name('logout');
@@ -24,7 +27,12 @@ Route::get('/admin/dashboard', fn() => view('adminzone.dashboard'));
 /* --- User Management --- */
 Route::get('/admin/users/add',        fn() => view('adminzone.users.add-user'));
 Route::get('/admin/users/manage',     fn() => view('adminzone.users.manage-users'));
-Route::get('/admin/users/roles',      fn() => view('adminzone.users.roles'));
+Route::get('/admin/users/roles',      [RoleController::class, 'index'])->name('roles.index');
+Route::get('/admin/users/roles/create', [RoleController::class, 'create'])->name('roles.create');
+Route::post('/admin/users/roles',     [RoleController::class, 'store'])->name('roles.store');
+Route::get('/admin/users/roles/{role}/edit', [RoleController::class, 'edit'])->name('roles.edit');
+Route::put('/admin/users/roles/{role}', [RoleController::class, 'update'])->name('roles.update');
+Route::delete('/admin/users/roles/{role}', [RoleController::class, 'destroy'])->name('roles.destroy');
 Route::get('/admin/users/customers',  fn() => view('adminzone.users.customers'));
 Route::get('/admin/users/suppliers',  fn() => view('adminzone.users.suppliers'));
 
