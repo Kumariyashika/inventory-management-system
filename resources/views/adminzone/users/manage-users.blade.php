@@ -33,39 +33,25 @@
                 <th>#</th>
                 <th>Name</th>
                 <th>Email ID</th>
-                <th>Phone</th>
                 <th>Role</th>
-                <th>Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            @php
-            $users = [
-                ['id'=>1,'name'=>'Kumari Yashika','email'=>'yashika@example.com','phone'=>'+91 98765 43210','role'=>'Admin','status'=>'Active'],
-                ['id'=>2,'name'=>'Rahul Sharma','email'=>'rahul@example.com','phone'=>'+91 91234 56789','role'=>'Warehouse','status'=>'Active'],
-                ['id'=>3,'name'=>'Priya Mehta','email'=>'priya@example.com','phone'=>'+91 99887 76655','role'=>'Account','status'=>'Inactive'],
-                ['id'=>4,'name'=>'Ankit Verma','email'=>'ankit@example.com','phone'=>'+91 88001 22334','role'=>'Warehouse','status'=>'Active'],
-            ];
-            @endphp
             @foreach($users as $u)
             <tr>
-                <td class="text-muted">{{ $u['id'] }}</td>
-                <td><strong>{{ $u['name'] }}</strong></td>
-                <td class="text-muted">{{ $u['email'] }}</td>
-                <td class="text-muted">{{ $u['phone'] }}</td>
-                <td><span class="role-pill role-{{ strtolower($u['role']) }}">{{ $u['role'] }}</span></td>
+                <td class="text-muted">{{ $u->id }}</td>
+                <td><strong>{{ $u->name }}</strong></td>
+                <td class="text-muted">{{ $u->email }}</td>
+                <td><span class="role-pill role-{{ strtolower($u->role->roleName ?? 'none') }}">{{ ucfirst($u->role->roleName ?? 'None') }}</span></td>
                 <td>
-                    @if($u['status'] === 'Active')
-                        <span class="status-pill status-completed">Active</span>
-                    @else
-                        <span class="status-pill status-onhold">Inactive</span>
-                    @endif
-                </td>
-                <td>
-                    <div class="action-btns">
-                        <button class="action-btn edit-btn" title="Edit"><i class="ph ph-pencil-simple"></i></button>
-                        <button class="action-btn delete-btn" title="Delete"><i class="ph ph-trash"></i></button>
+                    <div class="action-btns" style="display:flex;gap:8px;">
+                        <a href="{{ route('users.edit', $u->id) }}" class="action-btn edit-btn" title="Edit" style="color:#64748b;text-decoration:none;"><i class="ph ph-pencil-simple"></i></a>
+                        <form action="{{ route('users.destroy', $u->id) }}" method="POST" onsubmit="return confirm('Delete this user?');" style="margin:0;">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="action-btn delete-btn" title="Delete" style="background:none;border:none;color:#f43f5e;cursor:pointer;"><i class="ph ph-trash"></i></button>
+                        </form>
                     </div>
                 </td>
             </tr>
@@ -74,12 +60,7 @@
     </table>
 
     <div class="table-footer">
-        <span class="table-info">Showing 1 to 4 of 4 users</span>
-        <div class="pagination">
-            <button class="page-btn"><i class="ph ph-caret-left"></i></button>
-            <button class="page-btn active">1</button>
-            <button class="page-btn"><i class="ph ph-caret-right"></i></button>
-        </div>
+        <span class="table-info">Showing all {{ $users->count() }} users</span>
     </div>
 </div>
 @endsection

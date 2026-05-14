@@ -4,15 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Role;
 
-class RoleController
+class RoleController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        $roles = Role::all();
+        return view('adminzone.users.roles', compact('roles'));
     }
 
     /**
@@ -20,7 +22,7 @@ class RoleController
      */
     public function create()
     {
-        //
+        return view('adminzone.users.roles-create');
     }
 
     /**
@@ -28,7 +30,21 @@ class RoleController
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'roleName' => 'required|string|max:255',
+            'status' => 'required|in:active,inactive',
+            'permissions' => 'nullable|array'
+        ]);
+
+        $permissions = $request->permissions ? implode(',', $request->permissions) : '';
+
+        Role::create([
+            'roleName' => $request->roleName,
+            'status' => $request->status,
+            'permissions' => $permissions
+        ]);
+
+        return redirect()->route('roles.index')->with('success', 'Role created successfully.');
     }
 
     /**
@@ -36,7 +52,7 @@ class RoleController
      */
     public function show(string $id)
     {
-        //
+        // Not used currently in views
     }
 
     /**
@@ -44,7 +60,8 @@ class RoleController
      */
     public function edit(string $id)
     {
-        //
+        $role = Role::findOrFail($id);
+        return view('adminzone.users.roles-edit', compact('role'));
     }
 
     /**
@@ -52,7 +69,23 @@ class RoleController
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'roleName' => 'required|string|max:255',
+            'status' => 'required|in:active,inactive',
+            'permissions' => 'nullable|array'
+        ]);
+
+        $role = Role::findOrFail($id);
+
+        $permissions = $request->permissions ? implode(',', $request->permissions) : '';
+
+        $role->update([
+            'roleName' => $request->roleName,
+            'status' => $request->status,
+            'permissions' => $permissions
+        ]);
+
+        return redirect()->route('roles.index')->with('success', 'Role updated successfully.');
     }
 
     /**
@@ -60,7 +93,24 @@ class RoleController
      */
     public function destroy(string $id)
     {
-        //
+        $role = Role::findOrFail($id);
+        $role->delete();
+
+        return redirect()->route('roles.index')->with('success', 'Role deleted successfully.');
+    }
+
+    /**
+     * Remove multiple specified resources from storage.
+     */
+    public function destroyMultiple(Request $request)
+    {
+        $request->validate([
+            'role_ids' => 'required|array',
+            'role_ids.*' => 'exists:roles,id'
+        ]);
+
+        Role::whereIn('id', $request->role_ids)->delete();
+
+        return redirect()->route('roles.index')->with('success', 'Selected roles deleted successfully.');
     }
 }
-

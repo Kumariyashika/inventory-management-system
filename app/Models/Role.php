@@ -15,6 +15,11 @@ class Role extends Model
         'status',
     ];
 
+    public function getPermissionsArrayAttribute()
+    {
+        return $this->permissions ? explode(',', $this->permissions) : [];
+    }
+
     public function users()
     {
         return $this->hasMany(User::class, 'role_id');
