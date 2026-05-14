@@ -2,43 +2,47 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
-class LoginController extends Controller
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+
+class LoginController
 {
+    public function login()
+    {
+        return view('login');
+    }
+
     public function authenticate(Request $request)
     {
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
+        Log::info($credentials);
 
         if (Auth::attempt($credentials)) {
+            Log::info('try to login');
             $request->session()->regenerate();
 
-            $user = Auth::user();
-            $roleName = $user->role ? strtolower($user->role->roleName) : '';
 
-            switch ($roleName) {
-                case 'admin':
-                    return redirect()->intended('/admin/dashboard');
-                case 'manager':
-                    return redirect()->intended('/manager/dashboard');
-                case 'staff':
-                    return redirect()->intended('/staff/dashboard');
-                case 'purchase':
-                    return redirect()->intended('/purchase/dashboard');
-                case 'store':
-                    return redirect()->intended('/store/dashboard');
-                case 'supplier':
-                    return redirect()->intended('/supplier/dashboard');
-                case 'system':
-                    return redirect()->intended('/system/dashboard');
-                default:
-                    return redirect('/');
-            }
+            $user = Auth::user();
+            Log::info($user);
+            // Redirect based on role name
+            $role = strtolower($user->role->roleName);
+            Log::info($role);
+
+            return match ($role) {
+                'admin' => redirect()->intended('/admin/dashboard'),
+                'manager' => redirect()->intended('/manager/dashboard'),
+                'staff' => redirect()->intended('/staff/dashboard'),
+                'purchase' => redirect()->intended('/purchase/dashboard'),
+                'store' => redirect()->intended('/store/dashboard'),
+                'supplier' => redirect()->intended('/supplier/dashboard'),
+                'system' => redirect()->intended('/system/dashboard'),
+                default => redirect()->intended('/'),
+            };
         }
 
         return back()->withErrors([
