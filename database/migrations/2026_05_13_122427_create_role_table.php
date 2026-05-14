@@ -12,11 +12,12 @@ return new class extends Migration {
     {
         Schema::create('role', function (Blueprint $table) {
             $table->id();
-            $table->string('roleName');
-            $table->string('permissions');
-            $table->string('status');
-            $table->timestamps();
 
+            $table->string('name');
+            $table->text('permissions')->nullable();
+            $table->string('status')->default('active');
+
+            $table->timestamps();
         });
     }
 
